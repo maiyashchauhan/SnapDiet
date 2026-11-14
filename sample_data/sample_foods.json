@@ -1,0 +1,222 @@
+{
+  "cooked_meals": [
+    {
+      "name": "Dal Tadka with 2 Phulkas & Salad",
+      "region": "North Indian",
+      "portion": "1 bowl dal (200g), 2 rotis (70g), cucumber-tomato salad (100g)",
+      "calories": 420,
+      "protein": 16.5,
+      "carbs": 64.0,
+      "fats": 10.2,
+      "fiber": 11.0,
+      "cost_estimate_inr": 35,
+      "health_score": 92,
+      "micronutrients": ["Iron (2.8mg)", "Folate (95mcg)", "Potassium (380mg)"],
+      "tags": ["High Fiber", "Vegetarian", "Budget Star", "NSS Recommended"]
+    },
+    {
+      "name": "Masala Dosa with Sambar & Coconut Chutney",
+      "region": "South Indian",
+      "portion": "1 medium dosa with potato filling (180g), 1 bowl sambar (150ml), 2 tbsp chutney (30g)",
+      "calories": 485,
+      "protein": 11.2,
+      "carbs": 72.0,
+      "fats": 16.5,
+      "fiber": 7.5,
+      "cost_estimate_inr": 45,
+      "health_score": 78,
+      "micronutrients": ["Vitamin C (12mg)", "Magnesium (48mg)", "B-Vitamins"],
+      "tags": ["Fermented Gut Friendly", "Vegetarian", "Traditional"]
+    },
+    {
+      "name": "Paneer Bhurji with 2 Multigrain Rotis",
+      "region": "North/Central Indian",
+      "portion": "150g fresh paneer bhurji with bell peppers & tomatoes, 2 multigrain rotis",
+      "calories": 510,
+      "protein": 26.8,
+      "carbs": 42.0,
+      "fats": 25.4,
+      "fiber": 8.0,
+      "cost_estimate_inr": 65,
+      "health_score": 90,
+      "micronutrients": ["Calcium (380mg)", "Phosphorus (290mg)", "Vitamin A"],
+      "tags": ["High Protein", "Muscle Building", "Low Glycemic"]
+    },
+    {
+      "name": "Sprouted Moong & Chana Chaat",
+      "region": "Pan-Indian",
+      "portion": "1 big bowl (220g) with lemon, green chillies, onions & rock salt",
+      "calories": 280,
+      "protein": 18.5,
+      "carbs": 46.0,
+      "fats": 2.8,
+      "fiber": 14.2,
+      "cost_estimate_inr": 20,
+      "health_score": 98,
+      "micronutrients": ["Vitamin C (25mg)", "Zinc (2.1mg)", "Iron (3.5mg)"],
+      "tags": ["Superfood", "Budget King", "Max Protein/₹", "Zero Cooking"]
+    },
+    {
+      "name": "Egg Bhurji (3 eggs) with 2 Rotis",
+      "region": "Pan-Indian",
+      "portion": "3 whole eggs scrambled with onions, green chillies, coriander + 2 rotis",
+      "calories": 460,
+      "protein": 24.0,
+      "carbs": 38.0,
+      "fats": 22.0,
+      "fiber": 5.0,
+      "cost_estimate_inr": 40,
+      "health_score": 88,
+      "micronutrients": ["Choline (280mg)", "Vitamin B12 (1.8mcg)", "Selenium"],
+      "tags": ["High Bioavailability Protein", "Quick Prep", "Student Friendly"]
+    },
+    {
+      "name": "Soya Chunks Matar Curry with Steamed Brown Rice",
+      "region": "Pan-Indian",
+      "portion": "50g raw soya chunks cooked with green peas (200g curry) + 1 cup brown rice (150g)",
+      "calories": 490,
+      "protein": 31.5,
+      "carbs": 68.0,
+      "fats": 9.5,
+      "fiber": 13.0,
+      "cost_estimate_inr": 30,
+      "health_score": 95,
+      "micronutrients": ["Iron (5.2mg)", "Magnesium (95mg)", "Potassium (520mg)"],
+      "tags": ["Champion Vegan Protein", "Budget Star", "NSS Top Pick"]
+    },
+    {
+      "name": "Poha with Roasted Peanuts & Sprouts",
+      "region": "West/Central Indian",
+      "portion": "1 medium plate (200g) with curry leaves, mustard seeds, lemon",
+      "calories": 340,
+      "protein": 9.8,
+      "carbs": 56.0,
+      "fats": 8.5,
+      "fiber": 6.2,
+      "cost_estimate_inr": 18,
+      "health_score": 84,
+      "micronutrients": ["Iron (18mg - flattened rice)", "Vitamin C (15mg)"],
+      "tags": ["Iron Rich", "Easy Digestion", "Breakfast Staple"]
+    },
+    {
+      "name": "Fish Curry (Rohu/Katla) with Steamed Rice",
+      "region": "East/Coastal Indian",
+      "portion": "150g fish fillet in light mustard/tomato gravy + 1 cup rice (150g)",
+      "calories": 470,
+      "protein": 29.0,
+      "carbs": 52.0,
+      "fats": 15.0,
+      "fiber": 2.5,
+      "cost_estimate_inr": 75,
+      "health_score": 89,
+      "micronutrients": ["Omega-3 Fatty Acids (1200mg)", "Iodine", "Vitamin D"],
+      "tags": ["Heart Healthy", "Brain Boost", "Rich in Omega-3"]
+    }
+  ],
+  "packaged_foods": [
+    {
+      "product_name": "Ultra-Crisp Spiced Potato Chips (50g)",
+      "category": "Fried Snacks",
+      "calories": 275,
+      "protein": 3.1,
+      "carbs": 26.5,
+      "fats": 17.5,
+      "fiber": 1.2,
+      "sodium_mg": 480,
+      "added_sugar_g": 1.5,
+      "health_score": 28,
+      "warnings": [
+        "High Palm Oil Content (Trans/Saturated Fat risk)",
+        "Excessive Sodium (24% of daily limit in 1 small pack)",
+        "Ultra-Processed, Low Satiety"
+      ],
+      "healthy_indian_alternatives": [
+        {"name": "Roasted Makhana (Fox Nuts) with Rock Salt & Turmeric", "calories": 110, "protein": 4.5, "cost": "₹20"},
+        {"name": "Roasted Chana with Skin", "calories": 140, "protein": 7.8, "cost": "₹10"},
+        {"name": "Home-made Air-fried Moong Papad", "calories": 65, "protein": 3.2, "cost": "₹5"}
+      ]
+    },
+    {
+      "product_name": "Instant 2-Minute Masala Noodles (70g pack)",
+      "category": "Instant Noodles",
+      "calories": 315,
+      "protein": 6.0,
+      "carbs": 44.0,
+      "fats": 13.0,
+      "fiber": 1.8,
+      "sodium_mg": 890,
+      "added_sugar_g": 2.0,
+      "health_score": 35,
+      "warnings": [
+        "Dangerous Sodium Level (45% of daily recommended limit)",
+        "Refined Maida (White Flour) base - spikes blood sugar",
+        "Contains artificial flavor enhancers (INS 627, 631)"
+      ],
+      "healthy_indian_alternatives": [
+        {"name": "Whole Wheat/Millet Vermicelli Upma with Vegetables", "calories": 220, "protein": 7.5, "cost": "₹18"},
+        {"name": "Oats Khichdi with Moong Dal & Spinach", "calories": 240, "protein": 11.0, "cost": "₹22"},
+        {"name": "Sprouted Moong Noodles/Bhel", "calories": 190, "protein": 12.0, "cost": "₹15"}
+      ]
+    },
+    {
+      "product_name": "Glazed Chocolate Cream Biscuits (100g pack)",
+      "category": "Sweet Bakery",
+      "calories": 480,
+      "protein": 4.2,
+      "carbs": 68.0,
+      "fats": 21.5,
+      "fiber": 1.0,
+      "sodium_mg": 210,
+      "added_sugar_g": 34.0,
+      "health_score": 20,
+      "warnings": [
+        "Severe Sugar Shock: 34g sugar equals 8.5 teaspoons of pure sugar!",
+        "Hydrogenated Vegetable Fats (Vanaspati)",
+        "Zero micronutrient value"
+      ],
+      "healthy_indian_alternatives": [
+        {"name": "Ragi & Jaggery Sesame Ladoo", "calories": 160, "protein": 4.2, "cost": "₹15"},
+        {"name": "Peanut & Jaggery Chikki", "calories": 180, "protein": 6.5, "cost": "₹10"},
+        {"name": "Dates & Almond Energy Bite", "calories": 130, "protein": 3.8, "cost": "₹20"}
+      ]
+    }
+  ],
+  "quiz_questions": [
+    {
+      "id": 1,
+      "question": "According to ICMR-NIN guidelines (National Nutrition Week 2026), what is the recommended daily dietary protein intake for an average sedentary Indian adult?",
+      "options": [
+        "0.83 g per kg of ideal body weight",
+        "2.5 g per kg of ideal body weight",
+        "0.2 g per kg of ideal body weight",
+        "Only 10 grams total per day"
+      ],
+      "correct_index": 0,
+      "explanation": "ICMR-NIN (National Institute of Nutrition) recommends approximately 0.83g of high-quality protein per kg of body weight for a sedentary adult (approx. 54g for a 65kg adult) to prevent sarcopenia and maintain immune defense."
+    },
+    {
+      "id": 2,
+      "question": "Which of the following budget-friendly indigenous Indian foods provides the highest amount of plant-based protein per 100g dry weight?",
+      "options": [
+        "White Rice (approx 7g protein)",
+        "Soya Chunks / Defatted Soy Flour (approx 52g protein)",
+        "Potato (approx 2g protein)",
+        "Coconut Water (approx 0.5g protein)"
+      ],
+      "correct_index": 1,
+      "explanation": "Defatted Soya Chunks contain an astounding ~52g protein per 100g at a cost of merely ₹15-20 per 100g, making it the most cost-effective protein source in the Indian market!"
+    },
+    {
+      "id": 3,
+      "question": "What is the traditional 'Cereal-Pulse Complementarity' principle in Indian Thalis (e.g., Dal-Chawal or Roti-Dal)?",
+      "options": [
+        "It makes the food taste sweet without sugar",
+        "Cereals are deficient in Lysine but rich in Methionine, while Pulses are rich in Lysine but deficient in Methionine; combining them creates a complete amino acid profile!",
+        "It reduces the cooking time of lentils by half",
+        "It eliminates all carbohydrates from the diet"
+      ],
+      "correct_index": 1,
+      "explanation": "Traditional Indian combinations like Dal-Roti, Khichdi, or Idli-Sambar pair cereals (rich in methionine) with legumes/pulses (rich in lysine) to provide a complete essential amino acid profile equivalent to animal proteins!"
+    }
+  ]
+}
