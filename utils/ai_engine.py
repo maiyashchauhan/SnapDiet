@@ -4,21 +4,24 @@ import time
 import streamlit as st
 from google import genai
 from google.genai import types
-import google.genai._api_client
-
-# --- Monkey-patch for AQ Auth Keys ---
-original_request = google.genai._api_client.ApiClient.request
-def patched_request(self, http_method: str, path: str, request_dict, http_options=None):
-    if hasattr(self, 'api_key') and self.api_key and self.api_key.startswith('AQ.'):
-        if '?' in path:
-            path += f'&key={self.api_key}'
-        else:
-            path += f'?key={self.api_key}'
-        if http_options and 'headers' in http_options and 'x-goog-api-key' in http_options['headers']:
-            del http_options['headers']['x-goog-api-key']
-    return original_request(self, http_method, path, request_dict, http_options)
-google.genai._api_client.ApiClient.request = patched_request
-# ---------------------------------------
+# --- Optional compatibility patch for AQ Auth Keys ---
+try:
+    import google.genai._api_client
+    if hasattr(google.genai._api_client, 'ApiClient') and hasattr(google.genai._api_client.ApiClient, 'request'):
+        original_request = google.genai._api_client.ApiClient.request
+        def patched_request(self, http_method: str, path: str, request_dict, http_options=None):
+            if hasattr(self, 'api_key') and self.api_key and self.api_key.startswith('AQ.'):
+                if '?' in path:
+                    path += f'&key={self.api_key}'
+                else:
+                    path += f'?key={self.api_key}'
+                if http_options and 'headers' in http_options and 'x-goog-api-key' in http_options['headers']:
+                    del http_options['headers']['x-goog-api-key']
+            return original_request(self, http_method, path, request_dict, http_options)
+        google.genai._api_client.ApiClient.request = patched_request
+except Exception:
+    pass
+# ----------------------------------------------------
 
 @st.cache_resource
 def get_client():
