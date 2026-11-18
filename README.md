@@ -89,7 +89,6 @@ SnapDiet/
 
 ### Prerequisites
 * Python 3.10 or higher
-* [Google Gemini API Key](https://aistudio.google.com/app/apikey) (Free)
 * Git
 
 ### 1. Clone the Repository
