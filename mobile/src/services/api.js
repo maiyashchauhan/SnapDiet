@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { Platform } from 'react-native';
 
-// Automatically pointing to the local computer's network IP for Expo Go physical device testing
-const API_BASE_URL = 'http://10.16.87.39:8000/api';
+// Resolved base URL: uses bound or public API_URL if available, relative /api for web, or local network IP fallback
+const API_BASE_URL =
+  process.env.API_URL ||
+  process.env.EXPO_PUBLIC_API_URL ||
+  (Platform.OS === 'web' && typeof window !== 'undefined' ? '/api' : 'http://10.16.87.39:8000/api');
 
 const api = axios.create({
   baseURL: API_BASE_URL,

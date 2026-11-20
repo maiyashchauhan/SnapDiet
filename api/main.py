@@ -1,8 +1,16 @@
-import os
+import os, sys
+
+# Ensure api directory and repo root are in python path
+sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routes import auth, diet, ai
+
+try:
+    from api.routes import auth, diet, ai
+except ModuleNotFoundError:
+    from routes import auth, diet, ai
 
 app = FastAPI(title="SnapDiet API")
 
@@ -14,10 +22,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Support routes with and without /api prefix for public rewrites and internal bindings
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(auth.router, prefix="/auth", tags=["auth"])
+
 app.include_router(diet.router, prefix="/api/diet", tags=["diet"])
+app.include_router(diet.router, prefix="/diet", tags=["diet"])
+
 app.include_router(ai.router, prefix="/api/ai", tags=["ai"])
+app.include_router(ai.router, prefix="/ai", tags=["ai"])
 
 @app.get("/")
+@app.get("/api")
+@app.get("/api/")
 def read_root():
     return {"message": "SnapDiet API is running"}
