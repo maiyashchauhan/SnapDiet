@@ -4,6 +4,7 @@
     "app": {
       "root": ".",
       "runtime": "python",
+      "entrypoint": "web:app",
       "bindings": [
         {
           "type": "service",
@@ -15,7 +16,8 @@
     },
     "api": {
       "root": "api",
-      "framework": "fastapi"
+      "framework": "fastapi",
+      "entrypoint": "main:app"
     }
   },
   "rewrites": [
