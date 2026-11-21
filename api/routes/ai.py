@@ -1,9 +1,20 @@
+import sys, os
+current_dir = os.path.dirname(__file__)
+sys.path.insert(0, os.path.dirname(current_dir))
+sys.path.insert(0, os.path.join(os.path.dirname(current_dir), 'utils'))
+sys.path.insert(0, os.path.dirname(os.path.dirname(current_dir)))
+
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List, Dict, Any
-import sys, os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
-from utils.ai_engine import generate_custom_diet_plan, generate_workout_plan, nutribot_chat
+
+try:
+    from utils.ai_engine import generate_custom_diet_plan, generate_workout_plan, nutribot_chat
+except ModuleNotFoundError:
+    try:
+        from ai_engine import generate_custom_diet_plan, generate_workout_plan, nutribot_chat
+    except ModuleNotFoundError:
+        from api.utils.ai_engine import generate_custom_diet_plan, generate_workout_plan, nutribot_chat
 
 router = APIRouter()
 

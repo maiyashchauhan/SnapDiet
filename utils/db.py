@@ -3,12 +3,31 @@ import json
 import datetime
 import os
 
-DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "snapdiet.db")
+DB_DIR = os.environ.get("DB_DIR")
+if not DB_DIR and os.environ.get("VERCEL"):
+    DB_DIR = "/tmp"
+
+if DB_DIR:
+    DB_PATH = os.path.join(DB_DIR, "snapdiet.db")
+    bundled_db = os.path.join(os.path.dirname(os.path.dirname(__file__)), "snapdiet.db")
+    if not os.path.exists(DB_PATH) and os.path.exists(bundled_db):
+        import shutil
+        try:
+            shutil.copyfile(bundled_db, DB_PATH)
+        except Exception:
+            pass
+else:
+    DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "snapdiet.db")
 
 def get_connection():
-    # Use check_same_thread=False so that Streamlit's multiple threads don't crash
+    need_init = not os.path.exists(DB_PATH)
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
+    if need_init:
+        try:
+            init_db()
+        except Exception:
+            pass
     return conn
 
 def init_db():

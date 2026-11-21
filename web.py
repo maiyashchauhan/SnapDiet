@@ -235,10 +235,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       out.textContent = 'Calling /api ...';
       try {
         const res = await fetch('/api');
-        const data = await res.json();
-        out.textContent = JSON.stringify(data, null, 2);
+        const text = await res.text();
+        try {
+          const data = JSON.parse(text);
+          out.textContent = JSON.stringify(data, null, 2);
+        } catch (_) {
+          out.textContent = 'Status: ' + res.status + ' ' + res.statusText + '\n\n' + text;
+        }
       } catch (err) {
-        out.textContent = 'Error: ' + err.message;
+        out.textContent = 'Network Error: ' + err.message;
       }
     }
   </script>

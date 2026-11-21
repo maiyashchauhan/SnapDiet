@@ -1,7 +1,15 @@
 import os
 import json
 import time
-import streamlit as st
+
+try:
+    import streamlit as st
+    cache_decorator = st.cache_resource
+except ImportError:
+    st = None
+    def cache_decorator(func):
+        return func
+
 from google import genai
 from google.genai import types
 # --- Optional compatibility patch for AQ Auth Keys ---
@@ -23,12 +31,12 @@ except Exception:
     pass
 # ----------------------------------------------------
 
-@st.cache_resource
+@cache_decorator
 def get_client():
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         try:
-            if hasattr(st, "secrets") and "GEMINI_API_KEY" in st.secrets:
+            if st and hasattr(st, "secrets") and "GEMINI_API_KEY" in st.secrets:
                 api_key = st.secrets["GEMINI_API_KEY"]
                 os.environ["GEMINI_API_KEY"] = api_key
         except Exception:

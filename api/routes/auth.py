@@ -1,9 +1,20 @@
+import sys, os
+current_dir = os.path.dirname(__file__)
+sys.path.insert(0, os.path.dirname(current_dir))
+sys.path.insert(0, os.path.join(os.path.dirname(current_dir), 'utils'))
+sys.path.insert(0, os.path.dirname(os.path.dirname(current_dir)))
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
-import sys, os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
-from utils.db import get_user_profile_by_mobile, save_user_profile
+
+try:
+    from utils.db import get_user_profile_by_mobile, save_user_profile
+except ModuleNotFoundError:
+    try:
+        from db import get_user_profile_by_mobile, save_user_profile
+    except ModuleNotFoundError:
+        from api.utils.db import get_user_profile_by_mobile, save_user_profile
 
 router = APIRouter()
 
@@ -32,7 +43,6 @@ def login(req: LoginRequest):
 
 @router.post("/register")
 def register(profile: ProfileCreate):
-    # Calculate BMR, TDEE
     prof_dict = profile.model_dump()
     
     if prof_dict['sex'] == 'Male':
@@ -49,18 +59,17 @@ def register(profile: ProfileCreate):
     }
     tdee = bmr * activity_multipliers.get(prof_dict['activity_level'], 1.2)
     
-    if prof_dict['target_weight'] < prof_dict['weight']: target_calories = tdee - 500
-    elif prof_dict['target_weight'] > prof_dict['weight']: target_calories = tdee + 500
-    else: target_calories = tdee
+    prof_dict['target_calories'] = tdee - 500
+    prof_dict['tdee'] = tdee
     
     macros = {
-        'protein': (target_calories * 0.3) / 4,
-        'carbs': (target_calories * 0.4) / 4,
-        'fats': (target_calories * 0.3) / 9
+        'protein': (prof_dict['target_calories'] * 0.3) / 4,
+        'carbs': (prof_dict['target_calories'] * 0.4) / 4,
+        'fats': (prof_dict['target_calories'] * 0.3) / 9
     }
-    prof_dict['tdee'] = tdee
-    prof_dict['target_calories'] = target_calories
     prof_dict['macros'] = macros
+    prof_dict['diet_plan'] = []
     
-    save_user_profile(prof_dict)
-    return {"message": "Profile created successfully", "profile": prof_dict}
+    user_id = save_user_profile(prof_dict)
+    prof_dict['id'] = user_id
+    return {"message": "User registered successfully", "profile": prof_dict}

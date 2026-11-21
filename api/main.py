@@ -1,12 +1,16 @@
 import os, sys
 
-# Ensure api directory and repo root are in python path
-sys.path.append(os.path.dirname(__file__))
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+# Ensure api directory, api/utils, and repo root are in python path
+current_dir = os.path.dirname(__file__)
+root_dir = os.path.dirname(current_dir)
 
-from fastapi import FastAPI
+for path in [current_dir, os.path.join(current_dir, "utils"), root_dir]:
+    if path not in sys.path:
+        sys.path.insert(0, path)
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 
 try:
     from api.routes import auth, diet, ai
@@ -26,6 +30,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"error": "InternalServerError", "detail": str(exc), "path": request.url.path}
+    )
 
 # Support routes with and without /api prefix for public rewrites and internal bindings
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])

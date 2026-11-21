@@ -1,9 +1,20 @@
+import sys, os
+current_dir = os.path.dirname(__file__)
+sys.path.insert(0, os.path.dirname(current_dir))
+sys.path.insert(0, os.path.join(os.path.dirname(current_dir), 'utils'))
+sys.path.insert(0, os.path.dirname(os.path.dirname(current_dir)))
+
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List, Any
-import sys, os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
-from utils.db import get_daily_log, update_daily_log, update_user_diet_plan
+
+try:
+    from utils.db import get_daily_log, update_daily_log, update_user_diet_plan
+except ModuleNotFoundError:
+    try:
+        from db import get_daily_log, update_daily_log, update_user_diet_plan
+    except ModuleNotFoundError:
+        from api.utils.db import get_daily_log, update_daily_log, update_user_diet_plan
 
 router = APIRouter()
 
