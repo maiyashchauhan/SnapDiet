@@ -4,6 +4,7 @@ Provides the entrypoint callable 'app' for the 'app' service,
 reading the bound 'API_URL' to communicate with the internal 'api' service.
 """
 import os
+import ssl
 import json
 import urllib.request
 import urllib.error
@@ -13,12 +14,22 @@ def get_api_status():
     if not api_url:
         return {"status": "not_bound", "message": "API_URL environment variable is not set"}
     try:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
         req = urllib.request.Request(f"{api_url}/", headers={"User-Agent": "SnapDiet-AppService"})
-        with urllib.request.urlopen(req, timeout=5) as response:
+        with urllib.request.urlopen(req, timeout=5, context=ctx) as response:
             data = json.loads(response.read().decode("utf-8"))
             return {"status": "connected", "api_url": api_url, "response": data}
     except Exception as e:
-        return {"status": "configured", "api_url": api_url, "note": str(e)}
+        # Try /api/ fallback
+        try:
+            req = urllib.request.Request(f"{api_url}/api", headers={"User-Agent": "SnapDiet-AppService"})
+            with urllib.request.urlopen(req, timeout=5, context=ctx) as response:
+                data = json.loads(response.read().decode("utf-8"))
+                return {"status": "connected", "api_url": api_url, "response": data}
+        except Exception as inner_e:
+            return {"status": "configured", "api_url": api_url, "note": str(e)}
 
 def app(environ, start_response):
     path = environ.get("PATH_INFO", "/")
@@ -43,8 +54,9 @@ def app(environ, start_response):
 
     # HTML Landing Page
     api_info = get_api_status()
-    api_badge_color = "#10B981" if api_info.get("status") == "connected" else "#F59E0B"
-    api_status_text = f"Connected ({api_info.get('api_url')})" if api_info.get("status") == "connected" else (
+    is_connected = api_info.get("status") == "connected"
+    api_badge_color = "#10B981" if is_connected else "#F59E0B"
+    api_status_text = "Connected & Active" if is_connected else (
         "Internal Binding Active" if os.environ.get("API_URL") else "Standalone Mode"
     )
 
@@ -125,7 +137,7 @@ def app(environ, start_response):
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 0;
+      padding: 8px 0;
       font-size: 14px;
     }}
     .status-row:not(:last-child) {{
@@ -137,6 +149,7 @@ def app(environ, start_response):
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
+      margin-bottom: 12px;
     }}
     .btn {{
       display: flex;
@@ -200,7 +213,7 @@ def app(environ, start_response):
     </div>
 
     <div class="links">
-      <a class="btn btn-primary" href="/api/docs" target="_blank">
+      <a class="btn btn-primary" href="/api/docs">
         📖 API Documentation
       </a>
       <a class="btn btn-secondary" href="/status">
