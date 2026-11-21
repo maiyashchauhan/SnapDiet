@@ -22,13 +22,12 @@ def get_api_status():
             data = json.loads(response.read().decode("utf-8"))
             return {"status": "connected", "api_url": api_url, "response": data}
     except Exception as e:
-        # Try /api/ fallback
         try:
             req = urllib.request.Request(f"{api_url}/api", headers={"User-Agent": "SnapDiet-AppService"})
             with urllib.request.urlopen(req, timeout=5, context=ctx) as response:
                 data = json.loads(response.read().decode("utf-8"))
                 return {"status": "connected", "api_url": api_url, "response": data}
-        except Exception as inner_e:
+        except Exception:
             return {"status": "configured", "api_url": api_url, "note": str(e)}
 
 def app(environ, start_response):
@@ -52,7 +51,7 @@ def app(environ, start_response):
         start_response("200 OK", headers)
         return [body]
 
-    # HTML Landing Page
+    # HTML Landing Page & Interactive Portal
     api_info = get_api_status()
     is_connected = api_info.get("status") == "connected"
     api_badge_color = "#10B981" if is_connected else "#F59E0B"
@@ -94,7 +93,7 @@ def app(environ, start_response):
       border-radius: 16px;
       max-width: 680px;
       width: 100%;
-      padding: 40px;
+      padding: 32px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
     }}
     .badge {{
@@ -113,32 +112,32 @@ def app(environ, start_response):
       border: 1px solid rgba(16, 185, 129, 0.3);
     }}
     h1 {{
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 800;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       background: linear-gradient(135deg, #34D399 0%, #10B981 50%, #059669 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }}
     p.subtitle {{
       color: var(--text-muted);
-      font-size: 16px;
-      line-height: 1.6;
-      margin-bottom: 24px;
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 20px;
     }}
     .status-panel {{
       background: #0B1120;
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 16px 20px;
-      margin-bottom: 28px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
     }}
     .status-row {{
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
-      font-size: 14px;
+      padding: 6px 0;
+      font-size: 13px;
     }}
     .status-row:not(:last-child) {{
       border-bottom: 1px solid rgba(51, 65, 85, 0.5);
@@ -148,19 +147,21 @@ def app(environ, start_response):
     .links {{
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin-bottom: 16px;
     }}
     .btn {{
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 14px 20px;
+      padding: 12px 16px;
       border-radius: 10px;
       text-decoration: none;
       font-size: 14px;
       font-weight: 600;
+      cursor: pointer;
+      border: none;
       transition: all 0.2s ease;
     }}
     .btn-primary {{
@@ -178,9 +179,28 @@ def app(environ, start_response):
     .btn-secondary:hover {{
       background: #475569;
     }}
+    .btn-full {{
+      grid-column: span 2;
+    }}
+    .output-box {{
+      background: #0B1120;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #38BDF8;
+      display: none;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 200px;
+      overflow-y: auto;
+    }}
     @media (max-width: 600px) {{
-      .card {{ padding: 24px; }}
+      .card {{ padding: 20px; }}
       .links {{ grid-template-columns: 1fr; }}
+      .btn-full {{ grid-column: span 1; }}
     }}
   </style>
 </head>
@@ -190,7 +210,7 @@ def app(environ, start_response):
     <h1>🥗 SnapDiet</h1>
     <p class="subtitle">
       AI-Powered Personal Nutrition, Diet Planning & Health Platform.
-      Deployed on Vercel with dedicated <code>app</code> and <code>api</code> microservices and internal service bindings.
+      Multi-service deployment with isolated <code>app</code> and <code>api</code> services.
     </p>
 
     <div class="status-panel">
@@ -204,23 +224,43 @@ def app(environ, start_response):
       </div>
       <div class="status-row">
         <span class="status-label">FastAPI Backend</span>
-        <span class="status-val"><a href="/api" style="color: #38BDF8; text-decoration: none;">/api</a></span>
+        <span class="status-val"><a href="/api" target="_blank" style="color: #38BDF8; text-decoration: none;">/api ↗</a></span>
       </div>
       <div class="status-row">
-        <span class="status-label">Swagger Documentation</span>
-        <span class="status-val"><a href="/api/docs" style="color: #38BDF8; text-decoration: none;">/api/docs</a></span>
+        <span class="status-label">Swagger Docs</span>
+        <span class="status-val"><a href="/api/docs" target="_blank" style="color: #38BDF8; text-decoration: none;">/api/docs ↗</a></span>
       </div>
     </div>
 
     <div class="links">
-      <a class="btn btn-primary" href="/api/docs">
-        📖 API Documentation
+      <a class="btn btn-primary" href="/api/docs" target="_blank">
+        📖 Open Swagger Docs
       </a>
-      <a class="btn btn-secondary" href="/status">
-        ⚡ Service Status (JSON)
+      <button class="btn btn-secondary" onclick="testApi()">
+        ⚡ Test API Live
+      </button>
+      <a class="btn btn-secondary btn-full" href="/status" target="_blank">
+        🔍 Service Health (JSON)
       </a>
     </div>
+
+    <div id="output" class="output-box"></div>
   </div>
+
+  <script>
+    async function testApi() {
+      const out = document.getElementById('output');
+      out.style.display = 'block';
+      out.textContent = 'Calling /api ...';
+      try {
+        const res = await fetch('/api');
+        const data = await res.json();
+        out.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        out.textContent = 'Error: ' + err.message;
+      }
+    }
+  </script>
 </body>
 </html>"""
 

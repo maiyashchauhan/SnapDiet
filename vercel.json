@@ -22,15 +22,38 @@
   },
   "rewrites": [
     {
+      "source": "/api",
+      "destination": {
+        "service": "api",
+        "path": "/"
+      }
+    },
+    {
+      "source": "/api/docs",
+      "destination": {
+        "service": "api",
+        "path": "/docs"
+      }
+    },
+    {
+      "source": "/api/openapi.json",
+      "destination": {
+        "service": "api",
+        "path": "/openapi.json"
+      }
+    },
+    {
       "source": "/api/(.*)",
       "destination": {
-        "service": "api"
+        "service": "api",
+        "path": "/$1"
       }
     },
     {
       "source": "/(.*)",
       "destination": {
-        "service": "app"
+        "service": "app",
+        "path": "/$1"
       }
     }
   ]
