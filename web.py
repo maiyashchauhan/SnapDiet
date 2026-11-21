@@ -1,6 +1,6 @@
 """
 SnapDiet Web Service Entrypoint for Vercel Multi-Service Deployment.
-Provides the entrypoint callable 'app' for the 'app' service,
+Provides the entrypoint callable 'app' and 'handler' for the 'app' service,
 reading the bound 'API_URL' to communicate with the internal 'api' service.
 """
 import os
@@ -8,6 +8,7 @@ import ssl
 import json
 import urllib.request
 import urllib.error
+from http.server import BaseHTTPRequestHandler
 
 def get_api_status():
     api_url = os.environ.get("API_URL", "").rstrip("/")
@@ -30,43 +31,23 @@ def get_api_status():
         except Exception:
             return {"status": "configured", "api_url": api_url, "note": str(e)}
 
-def app(environ, start_response):
-    path = environ.get("PATH_INFO", "/")
-    query_string = environ.get("QUERY_STRING", "")
-
-    # JSON status endpoint
-    if path in ["/status", "/health"] or "format=json" in query_string:
-        api_info = get_api_status()
-        body = json.dumps({
-            "service": "SnapDiet Web App",
-            "version": "1.0.0",
-            "binding": api_info,
-            "status": "healthy"
-        }, indent=2).encode("utf-8")
-        headers = [
-            ("Content-Type", "application/json"),
-            ("Content-Length", str(len(body))),
-            ("Access-Control-Allow-Origin", "*"),
-        ]
-        start_response("200 OK", headers)
-        return [body]
-
-    # HTML Landing Page & Interactive Portal
+def build_status_payload():
     api_info = get_api_status()
-    is_connected = api_info.get("status") == "connected"
-    api_badge_color = "#10B981" if is_connected else "#F59E0B"
-    api_status_text = "Connected & Active" if is_connected else (
-        "Internal Binding Active" if os.environ.get("API_URL") else "Standalone Mode"
-    )
+    return json.dumps({
+        "service": "SnapDiet Web App",
+        "version": "1.0.0",
+        "binding": api_info,
+        "status": "healthy"
+    }, indent=2).encode("utf-8")
 
-    html = f"""<!DOCTYPE html>
+HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SnapDiet - AI Nutrition & Health Platform</title>
   <style>
-    :root {{
+    :root {
       --primary: #10B981;
       --primary-dark: #059669;
       --bg: #0F172A;
@@ -74,9 +55,9 @@ def app(environ, start_response):
       --text: #F8FAFC;
       --text-muted: #94A3B8;
       --border: #334155;
-    }}
-    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-    body {{
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -86,8 +67,8 @@ def app(environ, start_response):
       align-items: center;
       justify-content: center;
       padding: 24px;
-    }}
-    .card {{
+    }
+    .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 16px;
@@ -95,8 +76,8 @@ def app(environ, start_response):
       width: 100%;
       padding: 32px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-    }}
-    .badge {{
+    }
+    .badge {
       display: inline-block;
       padding: 4px 12px;
       border-radius: 9999px;
@@ -105,52 +86,52 @@ def app(environ, start_response):
       text-transform: uppercase;
       letter-spacing: 0.05em;
       margin-bottom: 16px;
-    }}
-    .badge-service {{
+    }
+    .badge-service {
       background: rgba(16, 185, 129, 0.15);
       color: var(--primary);
       border: 1px solid rgba(16, 185, 129, 0.3);
-    }}
-    h1 {{
+    }
+    h1 {
       font-size: 28px;
       font-weight: 800;
       margin-bottom: 8px;
       background: linear-gradient(135deg, #34D399 0%, #10B981 50%, #059669 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-    }}
-    p.subtitle {{
+    }
+    p.subtitle {
       color: var(--text-muted);
       font-size: 15px;
       line-height: 1.5;
       margin-bottom: 20px;
-    }}
-    .status-panel {{
+    }
+    .status-panel {
       background: #0B1120;
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 14px 18px;
       margin-bottom: 20px;
-    }}
-    .status-row {{
+    }
+    .status-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 6px 0;
       font-size: 13px;
-    }}
-    .status-row:not(:last-child) {{
+    }
+    .status-row:not(:last-child) {
       border-bottom: 1px solid rgba(51, 65, 85, 0.5);
-    }}
-    .status-label {{ color: var(--text-muted); }}
-    .status-val {{ font-weight: 600; font-family: monospace; }}
-    .links {{
+    }
+    .status-label { color: var(--text-muted); }
+    .status-val { font-weight: 600; font-family: monospace; }
+    .links {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin-bottom: 16px;
-    }}
-    .btn {{
+    }
+    .btn {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -163,26 +144,26 @@ def app(environ, start_response):
       cursor: pointer;
       border: none;
       transition: all 0.2s ease;
-    }}
-    .btn-primary {{
+    }
+    .btn-primary {
       background: var(--primary);
       color: #0F172A;
-    }}
-    .btn-primary:hover {{
+    }
+    .btn-primary:hover {
       background: var(--primary-dark);
       color: #FFF;
-    }}
-    .btn-secondary {{
+    }
+    .btn-secondary {
       background: #334155;
       color: var(--text);
-    }}
-    .btn-secondary:hover {{
+    }
+    .btn-secondary:hover {
       background: #475569;
-    }}
-    .btn-full {{
+    }
+    .btn-full {
       grid-column: span 2;
-    }}
-    .output-box {{
+    }
+    .output-box {
       background: #0B1120;
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -196,12 +177,12 @@ def app(environ, start_response):
       word-break: break-all;
       max-height: 200px;
       overflow-y: auto;
-    }}
-    @media (max-width: 600px) {{
-      .card {{ padding: 20px; }}
-      .links {{ grid-template-columns: 1fr; }}
-      .btn-full {{ grid-column: span 1; }}
-    }}
+    }
+    @media (max-width: 600px) {
+      .card { padding: 20px; }
+      .links { grid-template-columns: 1fr; }
+      .btn-full { grid-column: span 1; }
+    }
   </style>
 </head>
 <body>
@@ -220,7 +201,7 @@ def app(environ, start_response):
       </div>
       <div class="status-row">
         <span class="status-label">Internal API Binding</span>
-        <span class="status-val" style="color: {api_badge_color};">{api_status_text}</span>
+        <span class="status-val" style="color: __API_COLOR__;">__API_STATUS__</span>
       </div>
       <div class="status-row">
         <span class="status-label">FastAPI Backend</span>
@@ -264,10 +245,55 @@ def app(environ, start_response):
 </body>
 </html>"""
 
-    body = html.encode("utf-8")
+def build_html():
+    api_info = get_api_status()
+    is_connected = api_info.get("status") == "connected"
+    api_color = "#10B981" if is_connected else "#F59E0B"
+    api_text = "Connected & Active" if is_connected else (
+        "Internal Binding Active" if os.environ.get("API_URL") else "Standalone Mode"
+    )
+    return HTML_TEMPLATE.replace("__API_COLOR__", api_color).replace("__API_STATUS__", api_text).encode("utf-8")
+
+# --- WSGI Callable ---
+def app(environ, start_response):
+    path = environ.get("PATH_INFO", "/")
+    query_string = environ.get("QUERY_STRING", "")
+
+    if path in ["/status", "/health"] or "format=json" in query_string:
+        body = build_status_payload()
+        headers = [
+            ("Content-Type", "application/json"),
+            ("Content-Length", str(len(body))),
+            ("Access-Control-Allow-Origin", "*"),
+        ]
+        start_response("200 OK", headers)
+        return [body]
+
+    body = build_html()
     headers = [
         ("Content-Type", "text/html; charset=utf-8"),
         ("Content-Length", str(len(body))),
     ]
     start_response("200 OK", headers)
     return [body]
+
+# --- BaseHTTPRequestHandler Class ---
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path in ["/status", "/health"] or "format=json" in self.path:
+            body = build_status_payload()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
+        body = build_html()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+        return
